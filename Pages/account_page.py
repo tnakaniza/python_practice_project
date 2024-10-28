@@ -1,3 +1,5 @@
+import time
+
 from selenium.webdriver.support import expected_conditions as EC
 
 from selenium.webdriver.common.by import By
@@ -49,7 +51,9 @@ class AccountPage:
         return int(balance_element.text)
 
     def open_transactions(self):
-        self.driver.find_element(By.CSS_SELECTOR, "button[ng-click='transactions()']").click()
+        time.sleep(2)
+        #ToDO increase timer for test 3
+        self.driver.find_element(By.XPATH, "//button[contains(.,'Transactions')]").click()
 
     def validate_transaction(self, amount):
         transaction_table = self.driver.find_element(By.CSS_SELECTOR, "table")
