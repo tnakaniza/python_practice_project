@@ -1,0 +1,1 @@
+pytest -s -v -m"tamara" --alluredir="allure-results" --browser chrome
