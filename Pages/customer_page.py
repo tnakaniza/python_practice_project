@@ -1,7 +1,6 @@
 import random
 from venv import logger
 
-from selenium.webdriver.chrome import options
 from selenium.webdriver.support import expected_conditions as EC
 
 from selenium.webdriver.common.by import By
@@ -10,60 +9,36 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 
 class CustomerPage:
-    dropdown_id = "userSelect"
+    user_select_id = "userSelect"
     login_btn_xpath = "//button[contains(.,'Login')]"
-    account_select = "accountSelect"
+    account_select_xpath = "//select[@id='accountSelect']"
     options_tag_name = "option"
-
-    #logout_btn = (By.CSS_SELECTOR, "button[ng-click='byebye()']")
 
     def __init__(self, driver):
         self.driver = driver
 
-    def get_first_account_number(self):
-        wait = WebDriverWait(self.driver, 10)
-        options_tag_name_Element = wait.until(
-            EC.visibility_of_element_located((By.TAG_NAME, self.options_tag_name[0])))
-
-
-        #select_element = self.driver.find_element(self.account_select)
-        first_option = options_tag_name_Element.find_elements(By.TAG_NAME, "option")[0]
-        return first_option.text
-
     def select_random_customer(self):
-        wait = WebDriverWait(self.driver, 10)
-        dropdown_id_Element = wait.until(EC.visibility_of_element_located((By.ID, self.dropdown_id)))
+        wait = WebDriverWait(self.driver, 30)
+        dropdown_id_Element = wait.until(EC.visibility_of_element_located((By.ID, self.user_select_id)))
 
         # Locate the dropdown
-        select_element = Select(dropdown_id_Element)
+        #select_element = self.driver.find_element(By.ID, self.user_select_id)
 
         # Get all options from the dropdown
-        options = select_element.options
+        options = dropdown_id_Element.find_elements(By.TAG_NAME, "option")
 
-        # Select a random option, excluding the first option if it's a placeholder
-        random_index = random.randint(1, len(options) - 1)  # start from 1 to skip placeholder if needed
-        select_element.select_by_index(random_index)
-        # Get the selected customer name for logging purposes (optional)
-        selected_customer = options[random_index].text
-        print(f"Randomly selected customer: {selected_customer}")
+        # Select a random option, excluding any placeholder or empty option
+        options = [option for option in options if option.text.strip()]
+        random_option = random.choice(options)
+
+        # Click the randomly selected option
+        random_option.click()
+        print(f"Randomly selected customer: {random_option.text}")
+
+        return random_option.text
 
         # Click the Login button
+    def click_login_button(self):
         wait = WebDriverWait(self.driver, 20)
         customer_login_btn_Element = wait.until(EC.visibility_of_element_located((By.XPATH, self.login_btn_xpath)))
         customer_login_btn_Element.click()
-
-    def get_all_account_numbers(self):
-        wait = WebDriverWait(self.driver, 10)
-        wait.until(EC.visibility_of_element_located((By.ID, self.account_select)))
-
-        options = self.driver.find_element(self.account_select).find_elements(By.TAG_NAME, "option")
-        return [option.text for option in options]
-
-    def select_account_by_number(self, account_number):
-        wait = WebDriverWait(self.driver, 20)
-        select_element = wait.until(
-            EC.visibility_of_element_located((By.XPATH, f"//option[. = '{account_number}']")))
-        select_element.click()
-
-        #select_element = self.driver.find_element(self.account_select)
-        #select_element.find_element(By.XPATH, f"//option[. = '{account_number}']").click()
